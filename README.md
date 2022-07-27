@@ -27,12 +27,17 @@ A list of technologies used within the project:
 
 ## Installation
 ***
-A little intro about the installation. 
+Pasos para la instalacion de herramientas de desarrollo. 
 ```
-$ git clone https://example.com
-$ cd ../path/to/the/file
-$ npm install
-$ npm start
+$ 1.- https://www.python.org/downloads/
+$ 2.- https://flask.palletsprojects.com/en/2.1.x/installation/
+$ 3.- https://www.apachefriends.org/es/download.html
+$ 4.- Crear base de datos con sus tablas respectivas
+$ 5.- Instalar flask
+$ pip install flask 
+$ pip install Flask-Mysql
+$ pip install jinja2
+
 ```
 Side information: To use the application in a special environment use ```lorem ipsum``` to start
 
