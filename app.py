@@ -4,6 +4,8 @@ from flask import render_template, request
 from flaskext.mysql import MySQL
 from datetime import datetime
 
+from numpy import empty_like
+
 app = Flask(__name__)
 
 mysql = MySQL()
@@ -15,12 +17,23 @@ mysql.init_app(app)
 
 @app.route('/')
 def index():
-    sql = "INSERT INTO `empleados` (`id`, `nombre`, `correo`, `foto`) VALUES (NULL, 'Isidoro', 'itorrico.m@gmail.com', 'foto.jpg');"
+    #sql = "INSERT INTO `empleados` (`id`, `nombre`, `correo`, `foto`) VALUES (NULL, 'Isidoro', 'itorrico.m@gmail.com', 'foto.jpg');"
+    sql = "SELECT * FROM `empleados` ;"
     conn = mysql.connect()
     cursor = conn.cursor()
     cursor.execute(sql)
+    
+    empleados = cursor.fetchall()
+    #print(empleados)
+
     conn.commit()
-    return render_template('empleados/index.html')
+    return render_template('empleados/index.html',empleados=empleados)
+
+@app.route('/destroy/<int:id>')
+def destroy(id):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM empleados WHERE id=%s",(id))
 
 @app.route('/create')
 def create():
@@ -41,6 +54,7 @@ def storage():
 
     # sql = "INSERT INTO `empleados` (`id`, `nombre`, `correo`, `foto`) VALUES (NULL, 'Isidoro', 'itorrico.m@gmail.com', 'foto.jpg');"
     sql = "INSERT INTO `empleados` (`id`, `nombre`, `correo`, `foto`) VALUES (NULL, %s, %s, %s);"
+    
     #datos = (_nombre, _correo, _foto.filename) 
     datos = (_nombre, _correo, nuevoNombreFoto) 
     conn = mysql.connect()
@@ -52,4 +66,4 @@ def storage():
 if __name__ == '__main__':
     app.run(debug=True)
 
-# 36:49 Guardar imagen en carpeta uploads
+# 49:00 Consultando datos de tabla empleados
