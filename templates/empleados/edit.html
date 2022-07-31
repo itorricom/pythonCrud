@@ -1,5 +1,5 @@
+{% include 'header.html' %}
 Formulario para editar
-
 {% for empleado in empleados %}
 <form method="post" action="/update" enctype="multipart/form-data">
     <input type="text" value="{{empleado[0]}}" name="txtID" id="txtID">
@@ -17,3 +17,4 @@ Formulario para editar
     <input type="submit" value="Enviar">
 </form>
 {% endfor %}
+{% include 'footer.html' %}
