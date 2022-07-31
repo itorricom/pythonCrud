@@ -1,6 +1,6 @@
 
 from flask import Flask
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, url_for
 from flaskext.mysql import MySQL
 from flask import send_from_directory
 from datetime import datetime
@@ -122,4 +122,4 @@ def storage():
 if __name__ == '__main__':
     app.run(debug=True)
 
-# 1:24 Incluir archivos header y footer
+# 1:25 Ajustando imagen de edicion 
