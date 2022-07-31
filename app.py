@@ -4,7 +4,7 @@ from flask import render_template, request, redirect
 from flaskext.mysql import MySQL
 from datetime import datetime
 
-from numpy import empty_like
+from numpy import DataSource, empty_like
 
 app = Flask(__name__)
 
@@ -47,6 +47,20 @@ def edit(id):
     print(empleados)
     return render_template('empleados/edit.html', empleados=empleados)
 
+@app.route('/update', methods=['POST'])
+def update():
+    _nombre = request.form['txtNombre']
+    _correo = request.form['txtCorreo']
+    _foto = request.files['txtFoto']
+    id = request.form['txtID']
+    sql = "UPDATE empleados SET nombre=%s, correo=%s WHERE id=%s;"
+    datos= (_nombre, _correo, id)
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute(sql, datos)
+    conn.commit()
+    return redirect('/')
+
 @app.route('/create')
 def create():
     return render_template('empleados/create.html')
@@ -78,4 +92,4 @@ def storage():
 if __name__ == '__main__':
     app.run(debug=True)
 
-# 49:00 Eliminando datos de la tabla 
+# 1:06 Guardando la actualización 
