@@ -3,6 +3,7 @@ from flask import Flask
 from flask import render_template, request, redirect
 from flaskext.mysql import MySQL
 from datetime import datetime
+import os
 
 from numpy import DataSource, empty_like
 
@@ -14,6 +15,9 @@ app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = ''
 app.config['MYSQL_DATABASE_DB'] = 'python'
 mysql.init_app(app)
+
+CARPETA = os.path.join('uploads')
+app.config['CARPETA'] = CARPETA
 
 @app.route('/')
 def index():
@@ -57,6 +61,21 @@ def update():
     datos= (_nombre, _correo, id)
     conn = mysql.connect()
     cursor = conn.cursor()
+
+    now = datetime.now()
+    tiempo = now.strftime("%Y%H%M%S")
+
+    if _foto.filename!='':
+        nuevoNombreFoto = tiempo+_foto.filename
+        _foto.save("uploads/"+nuevoNombreFoto)
+
+        cursor.execute("SELECT foto FROM empleados WHERE id=%s", id)
+        fila=cursor.fetchall()
+
+        os.remove(os.path.join(app.config['CARPETA'],fila[0][0]))
+        cursor.execute("UPDATE empleados SET foto=%s WHERE id=%s",(nuevoNombreFoto,id))
+        conn.commit()
+
     cursor.execute(sql, datos)
     conn.commit()
     return redirect('/')
@@ -92,4 +111,4 @@ def storage():
 if __name__ == '__main__':
     app.run(debug=True)
 
-# 1:06 Guardando la actualización 
+# 1:14 Modificando foto
