@@ -37,6 +37,11 @@ def index():
 def destroy(id):
     conn = mysql.connect()
     cursor = conn.cursor()
+
+    cursor.execute("SELECT foto FROM empleados WHERE id=%s", id)
+    fila=cursor.fetchall()
+    os.remove(os.path.join(app.config['CARPETA'],fila[0][0]))
+
     cursor.execute("DELETE FROM empleados WHERE id=%s",(id))
     conn.commit()
     return redirect('/')
@@ -111,4 +116,4 @@ def storage():
 if __name__ == '__main__':
     app.run(debug=True)
 
-# 1:14 Modificando foto
+# 1:23 Borrar fotos en uploads
