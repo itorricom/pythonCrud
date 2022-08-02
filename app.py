@@ -6,8 +6,6 @@ from flask import send_from_directory
 from datetime import datetime
 import os
 
-from numpy import DataSource, empty_like
-
 app = Flask(__name__)
 app.secret_key = "mykey"
 
@@ -18,12 +16,6 @@ app.config['MYSQL_DATABASE_PASSWORD'] = ''
 app.config['MYSQL_DATABASE_DB'] = 'python'
 mysql.init_app(app)
 
-CARPETA = os.path.join('uploads')
-app.config['CARPETA'] = CARPETA
-
-@app.route('/uploads/<nombreFoto>')
-def uploads(nombreFoto):
-    return send_from_directory(app.config['CARPETA'], nombreFoto)
 
 @app.route('/')
 def index():
@@ -34,7 +26,7 @@ def index():
     cursor.execute(sql)
     
     empleados = cursor.fetchall()
-    #print(empleados)
+    print(empleados)
 
     conn.commit()
     return render_template('empleados/index.html',empleados=empleados)
@@ -43,11 +35,6 @@ def index():
 def destroy(id):
     conn = mysql.connect()
     cursor = conn.cursor()
-
-    cursor.execute("SELECT foto FROM empleados WHERE id=%s", id)
-    fila=cursor.fetchall()
-    os.remove(os.path.join(app.config['CARPETA'],fila[0][0]))
-
     cursor.execute("DELETE FROM empleados WHERE id=%s",(id))
     conn.commit()
     return redirect('/')
@@ -66,27 +53,12 @@ def edit(id):
 def update():
     _nombre = request.form['txtNombre']
     _correo = request.form['txtCorreo']
-    _foto = request.files['txtFoto']
+    _telefono = request.form['txtTelefono']
     id = request.form['txtID']
-    sql = "UPDATE empleados SET nombre=%s, correo=%s WHERE id=%s;"
-    datos= (_nombre, _correo, id)
+    sql = "UPDATE empleados SET nombre=%s, correo=%s, telefono=%s WHERE id=%s;"
+    datos= (_nombre, _correo, _telefono ,id)
     conn = mysql.connect()
-    cursor = conn.cursor()
-
-    now = datetime.now()
-    tiempo = now.strftime("%Y%H%M%S")
-
-    if _foto.filename!='':
-        nuevoNombreFoto = tiempo+_foto.filename
-        _foto.save("uploads/"+nuevoNombreFoto)
-
-        cursor.execute("SELECT foto FROM empleados WHERE id=%s", id)
-        fila=cursor.fetchall()
-
-        os.remove(os.path.join(app.config['CARPETA'],fila[0][0]))
-        cursor.execute("UPDATE empleados SET foto=%s WHERE id=%s",(nuevoNombreFoto,id))
-        conn.commit()
-
+    cursor = conn.cursor()  
     cursor.execute(sql, datos)
     conn.commit()
     return redirect('/')
@@ -99,24 +71,17 @@ def create():
 def storage():
     _nombre = request.form['txtNombre']
     _correo = request.form['txtCorreo']
-    _foto = request.files['txtFoto']
+    _telefono = request.form['txtTelefono']
 
-    if _nombre == '' or _correo == '' or _foto == '':
+    if _nombre == '' or _correo == '' or _telefono == '':
         flash('Recuerda llenar los datos de los campos')
-        return redirect(url_for('create'))
-
-    now = datetime.now()
-    tiempo = now.strftime("%Y%H%M%S")
-
-    if _foto.filename!='':
-        nuevoNombreFoto = tiempo+_foto.filename
-        _foto.save("uploads/"+nuevoNombreFoto)
-
+        return redirect(url_for('create'))   
+        
     # sql = "INSERT INTO `empleados` (`id`, `nombre`, `correo`, `foto`) VALUES (NULL, 'Isidoro', 'itorrico.m@gmail.com', 'foto.jpg');"
-    sql = "INSERT INTO `empleados` (`id`, `nombre`, `correo`, `foto`) VALUES (NULL, %s, %s, %s);"
+    sql = "INSERT INTO `empleados` (`id`, `nombre`, `correo`, `telefono`) VALUES (NULL, %s, %s, %s);"
     
     #datos = (_nombre, _correo, _foto.filename) 
-    datos = (_nombre, _correo, nuevoNombreFoto) 
+    datos = (_nombre, _correo, _telefono) 
     conn = mysql.connect()
     cursor = conn.cursor()
     cursor.execute(sql, datos)
